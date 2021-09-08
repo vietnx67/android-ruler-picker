@@ -70,6 +70,13 @@ final class RulerView extends View {
     private int mIndicatorInterval = 14 /* Default value */;
 
     /**
+     * Value interval between two values on the ruler.
+     * @see #setValueInterval(int)
+     * @see #getValueInterval()
+     */
+    private int mValueInterval = 10 /* Default value */;
+
+    /**
      * Minimum value. This value will be displayed at the left-most end of the ruler. This value
      * must be less than {@link #mMaxValue}.
      *
@@ -264,9 +271,9 @@ final class RulerView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         //Iterate through all value
-        for (int value = 1; value < mMaxValue - mMinValue; value++) {
+        for (int value = mValueInterval; value < mMaxValue - mMinValue; value += mValueInterval) {
 
-            if (value % 5 == 0) {
+            if (value % (5 * mValueInterval) == 0) {
                 drawLongIndicator(canvas, value);
                 drawValueText(canvas, value);
             } else {
@@ -286,7 +293,7 @@ final class RulerView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         //Measure dimensions
         mViewHeight = MeasureSpec.getSize(heightMeasureSpec);
-        int viewWidth = (mMaxValue - mMinValue - 1) * mIndicatorInterval;
+        int viewWidth = (mMaxValue - mMinValue - 1) * mIndicatorInterval / mValueInterval;
 
         updateIndicatorHeight(mLongIndicatorHeightRatio, mShortIndicatorHeightRatio);
 
@@ -314,9 +321,9 @@ final class RulerView extends View {
      */
     private void drawSmallIndicator(@NonNull final Canvas canvas,
                                     final int value) {
-        canvas.drawLine(mIndicatorInterval * value,
+        canvas.drawLine(mIndicatorInterval * value * (1.0f / mValueInterval),
                 0,
-                mIndicatorInterval * value,
+                mIndicatorInterval * value * (1.0f / mValueInterval),
                 mShortIndicatorHeight,
                 mIndicatorPaint);
     }
@@ -329,9 +336,9 @@ final class RulerView extends View {
      */
     private void drawLongIndicator(@NonNull final Canvas canvas,
                                    final int value) {
-        canvas.drawLine(mIndicatorInterval * value,
+        canvas.drawLine(mIndicatorInterval * value * (1.0f / mValueInterval),
                 0,
-                mIndicatorInterval * value,
+                mIndicatorInterval * value * (1.0f / mValueInterval),
                 mLongIndicatorHeight,
                 mIndicatorPaint);
     }
@@ -346,7 +353,7 @@ final class RulerView extends View {
     private void drawValueText(@NonNull final Canvas canvas,
                                final int value) {
         canvas.drawText(String.valueOf(value + mMinValue),
-                mIndicatorInterval * value,
+                mIndicatorInterval * value * (1.0f / mValueInterval),
                 mLongIndicatorHeight + mTextPaint.getTextSize(),
                 mTextPaint);
     }
@@ -476,6 +483,14 @@ final class RulerView extends View {
     }
 
     /**
+     * @return Get interval between two values in ruler.
+     * @see #setValueInterval(int)
+     */
+    int getValueInterval() {
+        return mValueInterval;
+    }
+
+    /**
      * Set the spacing between two vertical lines/indicators. Default value is 14 pixels.
      *
      * @param indicatorIntervalPx Distance in pixels. This cannot be negative number or zero.
@@ -486,6 +501,20 @@ final class RulerView extends View {
             throw new IllegalArgumentException("Interval cannot be negative or zero.");
 
         mIndicatorInterval = indicatorIntervalPx;
+        invalidate();
+    }
+
+    /**
+     * Set the interval between two values in ruler. Default value is 10 unit.
+     *
+     * @param valueInterval interval in unit. This cannot be negative number or zero.
+     * @throws IllegalArgumentException if interval is negative or zero.
+     */
+    void setValueInterval(final int valueInterval) {
+        if (valueInterval <= 0)
+            throw new IllegalArgumentException("Interval cannot be negative or zero.");
+
+        mValueInterval = valueInterval;
         invalidate();
     }
 

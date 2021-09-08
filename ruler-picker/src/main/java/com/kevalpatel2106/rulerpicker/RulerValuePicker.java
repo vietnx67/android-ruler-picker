@@ -195,6 +195,10 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
                     setMinMaxValue(a.getInteger(R.styleable.RulerValuePicker_min_value, 0),
                             a.getInteger(R.styleable.RulerValuePicker_max_value, 100));
                 }
+
+                if (a.hasValue(R.styleable.RulerValuePicker_value_interval)) {
+                    setValueInterval(a.getInteger(R.styleable.RulerValuePicker_value_interval, 10));
+                }
             } finally {
                 a.recycle();
             }
@@ -318,7 +322,7 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
                 } else if (value > mRulerView.getMaxValue()) {
                     valuesToScroll = mRulerView.getMaxValue() - mRulerView.getMinValue();
                 } else {
-                    valuesToScroll = value - mRulerView.getMinValue();
+                    valuesToScroll = value / mRulerView.getValueInterval() - mRulerView.getMinValue();
                 }
 
                 mHorizontalScrollView.smoothScrollTo(
@@ -331,7 +335,7 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
      * @return Get the current selected value.
      */
     public int getCurrentValue() {
-        int absoluteValue = mHorizontalScrollView.getScrollX() / mRulerView.getIndicatorIntervalWidth();
+        int absoluteValue = mHorizontalScrollView.getScrollX() / mRulerView.getIndicatorIntervalWidth() * mRulerView.getValueInterval();
         int value = mRulerView.getMinValue() + absoluteValue;
 
         if (value > mRulerView.getMaxValue()) {
@@ -601,6 +605,16 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
      */
     public void setIndicatorIntervalDistance(final int indicatorIntervalPx) {
         mRulerView.setIndicatorIntervalDistance(indicatorIntervalPx);
+    }
+
+    /**
+     * Set the interval between two values in ruler. Default value is 10 unit.
+     *
+     * @param valueInterval interval in unit. This cannot be negative number or zero.
+     * @throws IllegalArgumentException if interval is negative or zero.
+     */
+    void setValueInterval(final int valueInterval) {
+        mRulerView.setValueInterval(valueInterval);
     }
 
     /**
