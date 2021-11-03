@@ -273,7 +273,7 @@ final class RulerView extends View {
         //Iterate through all value
         for (int value = mValueInterval; value < mMaxValue - mMinValue; value += mValueInterval) {
 
-            if (value % (5 * mValueInterval) == 0) {
+            if (value % (10 * mValueInterval) == 0) {
                 drawLongIndicator(canvas, value);
                 drawValueText(canvas, value);
             } else {
